@@ -1,0 +1,207 @@
+/* mobile.css */
+/* Mobile First Approach */
+
+/* Base mobile styles */
+@media (max-width: 768px) {
+    /* Typography scaling */
+    .premium-title {
+      font-size: 2.5rem !important;
+      line-height: 1.2;
+    }
+    
+    .main-title {
+      font-size: 2rem !important;
+    }
+    
+    /* Header improvements */
+    #main-header .container {
+      padding: 0 1rem;
+    }
+    
+    #main-header .text-2xl {
+      font-size: 1.5rem;
+    }
+    
+    /* Compact header for mobile */
+    #user-profile {
+      gap: 0.5rem;
+    }
+    
+    #profile-username {
+      display: none;
+    }
+    
+    /* Navigation improvements */
+    .glass-card {
+      padding: 1.5rem;
+      margin: 0.5rem;
+      border-radius: 16px;
+    }
+    
+    /* Grid layouts for mobile */
+    .grid-cols-1, 
+    .grid-cols-2,
+    .grid-cols-3,
+    .lg\\:grid-cols-3 {
+      grid-template-columns: 1fr !important;
+      gap: 1rem;
+    }
+    
+    /* Quote card mobile optimization */
+    #quote-card {
+      margin: 0.5rem;
+      padding: 1.5rem;
+    }
+    
+    #quote-text {
+      font-size: 1.25rem;
+      line-height: 1.4;
+    }
+    
+    #quote-author {
+      font-size: 1rem;
+    }
+    
+    /* Button sizing for touch */
+    .premium-button {
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Form elements */
+    .premium-input {
+      padding: 1rem;
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Tab navigation */
+    .tab-btn {
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    
+    /* Music player positioning */
+    #music-player {
+      bottom: 2rem;
+      right: 2rem;
+    }
+    
+    /* Footer adjustments */
+    .main-footer {
+      padding: 1.5rem 1rem;
+    }
+    
+    /* Social links spacing */
+    .social-link {
+      padding: 0.5rem;
+    }
+  }
+  
+  /* Small phones */
+  @media (max-width: 480px) {
+    .premium-title {
+      font-size: 2rem !important;
+    }
+    
+    .main-title {
+      font-size: 1.75rem !important;
+    }
+    
+    .glass-card {
+      padding: 1.25rem;
+      margin: 0.25rem;
+    }
+    
+    /* Stack action buttons vertically on very small screens */
+    .quote-actions {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    /* Improve touch targets */
+    button, 
+    a, 
+    .clickable {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+  
+  /* Tablet optimizations */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .premium-title {
+      font-size: 3.5rem;
+    }
+    
+    .grid-cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .lg\\:grid-cols-3 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  /* Mobile menu for small screens */
+  .mobile-menu-btn {
+    display: none;
+  }
+  
+  @media (max-width: 768px) {
+    .mobile-menu-btn {
+      display: block;
+    }
+    
+    .desktop-nav {
+      display: none;
+    }
+    
+    .mobile-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: var(--bg-card);
+      z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .mobile-nav.active {
+      transform: translateX(0);
+    }
+  }
+  
+  /* Safe area insets for modern phones */
+  @supports(padding: max(0px)) {
+    .safe-area-padding {
+      padding-left: max(1rem, env(safe-area-inset-left));
+      padding-right: max(1rem, env(safe-area-inset-right));
+      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+  }
+  
+  /* Prevent horizontal scroll */
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; 
+  }
+  
+  
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
