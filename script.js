@@ -1,11 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- TEMPLATE ДЛЯ HEADER ---
     const headerTemplate = `
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="index.html" class="flex items-center gap-3">
-                <img src="images/makeurdaylogo.png" alt="Logo" class="h-10 w-10 md:h-12 md:w-12 object-contain">
-                <span class="text-2xl font-bold tracking-wider main-gradient-text">MakeYourDay</span>
-            </a>
+        <div class="container mx-auto flex justify-between items-center safe-area-padding">
+            <div class="flex items-center gap-3">
+                <button id="mobile-menu-btn" class="mobile-menu-btn glass-card-footer p-3 rounded-lg md:hidden">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <a href="index.html" class="flex items-center gap-3">
+                    <img src="images/makeurdaylogo.png" alt="Logo" class="h-10 w-10 md:h-12 md:w-12 object-contain">
+                    <span class="text-2xl font-bold tracking-wider main-gradient-text">MakeYourDay</span>
+                </a>
+            </div>
             <div class="flex items-center gap-2 md:gap-4">
                  <a href="leaderboard.html" class="hidden md:flex items-center gap-2 glass-card-footer px-3 py-2 rounded-lg hover:bg-slate-700/80 transition-colors" data-key="leaderboardsBtn">
                     <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
@@ -20,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i data-lucide="bell" class="w-5 h-5 text-slate-400 hover:text-white transition-colors"></i>
                         <span id="notifications-count" class="absolute top-1 right-1 notification-badge hidden"></span>
                     </a>
-                    <a href="account.html" class="flex items-center gap-2 text-right p-2 rounded-md hover:bg-slate-700/50 transition-colors">
+                    <a href="account.html" class="hidden md:flex items-center gap-2 text-right p-2 rounded-md hover:bg-slate-700/50 transition-colors">
                         <div>
                             <span id="profile-username" class="font-bold text-white block text-sm">Username</span>
                             <span id="profile-plan" class="text-xs uppercase font-bold">Free Plan</span>
@@ -49,8 +54,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-nav" class="mobile-nav hidden fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-lg">
+            <div class="flex flex-col h-full safe-area-padding">
+                <div class="flex justify-between items-center p-4 border-b border-slate-700">
+                    <span class="text-xl font-bold main-gradient-text">Menu</span>
+                    <button id="mobile-close-btn" class="p-2 text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <nav class="flex-1 p-4 space-y-4">
+                    <a href="index.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800/50 transition-colors text-lg">
+                        <i data-lucide="home" class="w-5 h-5"></i> Home
+                    </a>
+                    <a href="account.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800/50 transition-colors text-lg">
+                        <i data-lucide="user" class="w-5 h-5"></i> Account
+                    </a>
+                    <a href="leaderboard.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800/50 transition-colors text-lg">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Leaderboard
+                    </a>
+                    <a href="favorites.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800/50 transition-colors text-lg">
+                        <i data-lucide="heart" class="w-5 h-5"></i> Favorites
+                    </a>
+                    <a href="subscribe.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800/50 transition-colors text-lg">
+                        <i data-lucide="crown" class="w-5 h-5"></i> Subscribe
+                    </a>
+                </nav>
+                <div class="p-4 border-t border-slate-700">
+                    <div class="flex items-center gap-3 p-3">
+                        <img id="mobile-profile-avatar" src="images/default-avatar.png" class="w-10 h-10 rounded-full object-cover border-2 border-slate-600">
+                        <div>
+                            <div id="mobile-profile-username" class="font-bold text-white">Guest</div>
+                            <div id="mobile-profile-plan" class="text-xs text-slate-400">Free Plan</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
-
 
     // --- DATABASE ---
     const quotes = {
@@ -223,7 +265,9 @@ document.addEventListener('DOMContentLoaded', () => {
             typeMessagePlaceholder: "Введите сообщение...",
             noFriendsYet: "У этого пользователя пока нет друзей.",
             userReading: "сейчас читает...",
-            noUsersOnline: "Сейчас нет пользователей онлайн."
+            noUsersOnline: "Сейчас нет пользователей онлайн.",
+            menu: "Меню",
+            close: "Закрыть"
         }, 
         en: { 
             title: "Make Your Day - Motivational Quotes", 
@@ -331,7 +375,9 @@ document.addEventListener('DOMContentLoaded', () => {
             typeMessagePlaceholder: "Type a message...",
             noFriendsYet: "This user has no friends yet.",
             userReading: "is currently reading...",
-            noUsersOnline: "No users online right now."
+            noUsersOnline: "No users online right now.",
+            menu: "Menu",
+            close: "Close"
         }, 
     };
 
@@ -468,6 +514,105 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- MOBILE MENU FUNCTIONALITY ---
+    function setupMobileMenu() {
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileCloseBtn = document.getElementById('mobile-close-btn');
+        const mobileNav = document.getElementById('mobile-nav');
+
+        if (!mobileMenuBtn || !mobileNav) return;
+
+        function openMobileMenu() {
+            mobileNav.classList.remove('hidden');
+            setTimeout(() => mobileNav.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileMenu() {
+            mobileNav.classList.remove('active');
+            setTimeout(() => {
+                mobileNav.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        mobileMenuBtn.addEventListener('click', openMobileMenu);
+        mobileCloseBtn.addEventListener('click', closeMobileMenu);
+
+        // Close menu when clicking on links
+        mobileNav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', closeMobileMenu);
+        });
+
+        // Close menu when clicking outside
+        mobileNav.addEventListener('click', (e) => {
+            if (e.target === mobileNav) {
+                closeMobileMenu();
+            }
+        });
+
+        // Update mobile profile info
+        updateMobileProfile();
+    }
+
+    function updateMobileProfile() {
+        if (!currentUser) return;
+        
+        const mobileAvatar = document.getElementById('mobile-profile-avatar');
+        const mobileUsername = document.getElementById('mobile-profile-username');
+        const mobilePlan = document.getElementById('mobile-profile-plan');
+
+        if (mobileAvatar) mobileAvatar.src = currentUser.avatar || DEFAULT_AVATAR;
+        if (mobileUsername) {
+            mobileUsername.textContent = currentUser.username;
+            mobileUsername.className = `font-bold text-white ${currentUser.usernameClass || ''}`;
+        }
+        if (mobilePlan) {
+            mobilePlan.textContent = `${currentUser.plan} Plan`;
+            mobilePlan.className = `text-xs ${currentUser.planClass || 'text-slate-400'}`;
+        }
+    }
+
+    // --- TOUCH GESTURES ---
+    function setupTouchGestures() {
+        let startX = 0;
+        let startY = 0;
+        let startTime = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            startTime = Date.now();
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (!startX || !startY) return;
+
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const endTime = Date.now();
+
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+            const timeDiff = endTime - startTime;
+
+            // Only consider quick swipes (less than 500ms)
+            if (timeDiff < 500) {
+                // Horizontal swipe (min 50px movement)
+                if (Math.abs(diffX) > 50 && Math.abs(diffY) < 30) {
+                    // Swipe left to go back in history
+                    if (diffX > 0 && !window.location.pathname.includes('index.html')) {
+                        window.history.back();
+                    }
+                }
+            }
+
+            startX = 0;
+            startY = 0;
+            startTime = 0;
+        });
+    }
+
     function renderHeader() {
         const headerContainer = document.getElementById('main-header');
         if (!headerContainer) return;
@@ -494,6 +639,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             updateNotificationCounts();
+            updateMobileProfile();
 
             if (currentUser.plan === 'vip' || currentUser.plan === 'Developer') {
                 const themeSwitcher = headerContainer.querySelector('#theme-switcher-container');
@@ -508,6 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
             authButtons.classList.add('flex');
         }
         attachLangSwitcherListeners(headerContainer);
+        setupMobileMenu();
     }
     
     function updateNotificationCounts() {
@@ -989,7 +1136,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
     function renderQuoteLeaderboard() {
         const container = document.getElementById('quote-leaderboard');
         if (!container) return;
@@ -1399,7 +1545,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
     function sendMessage(receiver) {
         const input = document.getElementById('chat-input');
         const text = input.value.trim();
@@ -1549,6 +1694,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const pagePath = window.location.pathname;
         setupGlobalMusic();
 
+        // Setup touch gestures for mobile
+        setupTouchGestures();
+
         if (pagePath.includes('index.html') || pagePath.endsWith('/')) {
             document.getElementById('new-quote-btn')?.addEventListener('click', displayNewQuote);
             document.getElementById('spark-done-btn')?.addEventListener('click', handleSparkCompletion);
@@ -1581,7 +1729,6 @@ document.addEventListener('DOMContentLoaded', () => {
             nicknameEl.className = `font-light ${currentUser.usernameClass || ''}`;
             const planEl = document.getElementById('user-plan');
             planEl.className = `font-light uppercase ${currentUser.planClass || ''}`;
-
 
             document.getElementById('avatar-upload').addEventListener('change', (e) => {
                 const file = e.target.files[0];
@@ -1702,7 +1849,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             lang: 'ru',
                             favorites: [],
                             theme: 'default',
-                            avatar: DEFAULT_AVATAR, // Assign default avatar here
+                            avatar: DEFAULT_AVATAR,
                             bio: '',
                             quotesViewed: 0,
                             usage: { date: new Date().toISOString().split('T')[0], count: 0 },
