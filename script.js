@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const headerTemplate = `
         <div class="container mx-auto flex justify-between items-center">
             <a href="index.html" class="flex items-center gap-3">
-                <img src="../images/makeurdaylogo.png" alt="Logo" class="h-10 w-10 md:h-12 md:w-12 object-contain">
+                <img src="images/makeurdaylogo.png" alt="Logo" class="h-10 w-10 md:h-12 md:w-12 object-contain">
                 <span class="text-2xl font-bold tracking-wider main-gradient-text">MakeYourDay</span>
             </a>
             <div class="flex items-center gap-2 md:gap-4">
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span id="profile-username" class="font-bold text-white block text-sm">Username</span>
                             <span id="profile-plan" class="text-xs uppercase font-bold">Free Plan</span>
                         </div>
-                        <img id="profile-avatar-icon" src="../images/default-avatar.png" class="w-8 h-8 rounded-full object-cover border-2 border-slate-600">
+                        <img id="profile-avatar-icon" src="images/default-avatar.png" class="w-8 h-8 rounded-full object-cover border-2 border-slate-600">
                     </a>
                     <button id="logout-btn" title="Выйти" class="p-2 rounded-md hover:bg-slate-700/50 transition-colors">
                         <i data-lucide="log-out" class="w-5 h-5 text-slate-400 hover:text-white transition-colors"></i>
@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const PLAN_LIMITS = { free: 3, premium: 20, vip: Infinity, developer: Infinity, makeyourdayofficial: Infinity, guest: 3 };
     const THEMES = ['default', 'cyberpunk', 'retro', 'forest'];
     let musicState = { playing: false, currentTime: 0 };
-    const DEFAULT_AVATAR = '../images/default-avatar.png';
+    const DEFAULT_AVATAR = 'images/default-avatar.png';
 
     // --- DATA MANAGEMENT ---
     function getUsersDB() { return JSON.parse(localStorage.getItem('makeYourDayUsers')) || {}; }
@@ -1243,7 +1243,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  <img src="${friend?.avatar || DEFAULT_AVATAR}" class="w-10 h-10 rounded-full object-cover">
                  <h2 class="text-xl font-bold">${translations[lang].chatWith} <span class="${friend.usernameClass || ''}">${friendUsername}</span></h2>
             </div>
-            <div id="chat-messages" class="h-[45vh] overflow-y-auto pr-2 mb-4"></div>
+            <div id="chat-messages" class="h-[60vh] md:h-[45vh] overflow-y-auto pr-2 mb-4"></div>
             <form id="chat-form" class="flex gap-2">
                 <input type="text" id="chat-input" placeholder="${translations[lang].typeMessagePlaceholder}" class="premium-input flex-grow" required>
                 <button type="submit" class="premium-button !p-3 flex-shrink-0"><i data-lucide="send" class="w-5 h-5"></i></button>
@@ -1305,7 +1305,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
 
             return `
-                <div class="chat-message-container ${isMe ? 'sent' : 'received'}" style="animation-delay: ${index * 80}ms">
+                <div class="chat-message-container ${isMe ? 'sent' : 'received'}" style="animation-delay: ${index * 80}ms" data-timestamp="${msg.timestamp}">
                     <div class="chat-message-inner">
                         ${!isMe ? `<img src="${sender?.avatar || DEFAULT_AVATAR}" alt="${msg.sender}" class="chat-avatar">` : ''}
                         <div class="message-content">
@@ -1343,26 +1343,26 @@ document.addEventListener('DOMContentLoaded', () => {
     function attachMessageReactionListeners(friendUsername) {
         const chatBox = document.getElementById('chat-messages');
         const key = getConversationKey(currentUser.username, friendUsername);
-        const conversation = (getMessagesDB()[key] || []);
 
-        chatBox.querySelectorAll('.message-react-button').forEach((button, index) => {
-            const messageContainer = button.closest('.chat-message-container.received');
+        chatBox.querySelectorAll('.message-react-button').forEach(button => {
+            const messageContainer = button.closest('.chat-message-container');
             if(!messageContainer) return;
             
             const picker = button.querySelector('.emoji-picker');
             
             button.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // Hide all other pickers
-                document.querySelectorAll('.emoji-picker.visible').forEach(p => p.classList.remove('visible'));
+                document.querySelectorAll('.emoji-picker.visible').forEach(p => {
+                    if (p !== picker) p.classList.remove('visible');
+                });
                 picker.classList.toggle('visible');
             });
             
             picker.querySelectorAll('[data-emoji]').forEach(emojiSpan => {
                 emojiSpan.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const emoji = e.currentTarget.dataset.emoji;
-                    // Find the correct message timestamp
-                    const msgTimestamp = conversation.filter(m => m.receiver === currentUser.username)[index]?.timestamp;
+                    const msgTimestamp = messageContainer.dataset.timestamp;
                     if(msgTimestamp) {
                         handleMessageReaction(key, msgTimestamp, emoji, friendUsername);
                     }
@@ -1388,6 +1388,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userIndex > -1) {
                 message.reactions[emoji].splice(userIndex, 1);
             } else {
+                 Object.values(message.reactions).forEach(users => {
+                    const idx = users.indexOf(currentUser.username);
+                    if (idx > -1) users.splice(idx, 1);
+                });
                 message.reactions[emoji].push(currentUser.username);
             }
             saveMessagesDB(messagesDB);
@@ -1567,11 +1571,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!currentUser) { window.location.href = 'auth.html?mode=login'; return; }
             document.getElementById('user-nickname').textContent = currentUser.username;
             document.getElementById('user-plan').textContent = currentUser.plan;
-            document.getElementById('quotes-viewed-stat').textContent = currentUser.quotesViewed || 0;
             const avatarImg = document.getElementById('profile-avatar');
             const bioText = document.getElementById('user-bio');
             avatarImg.src = currentUser.avatar || DEFAULT_AVATAR;
             bioText.value = currentUser.bio;
+
+            document.getElementById('quotes-viewed-stat').textContent = currentUser.quotesViewed || 0;
+            const nicknameEl = document.getElementById('user-nickname');
+            nicknameEl.className = `font-light ${currentUser.usernameClass || ''}`;
+            const planEl = document.getElementById('user-plan');
+            planEl.className = `font-light uppercase ${currentUser.planClass || ''}`;
+
+
             document.getElementById('avatar-upload').addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
